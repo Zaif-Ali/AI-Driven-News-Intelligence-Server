@@ -1,0 +1,109 @@
+name: ai-driven-news-intelligence-server-dev
+
+networks:
+  ai_news_dev_network:
+    driver: bridge
+
+volumes:
+  ai_news_mongo_data:
+    driver: local
+    name: ai_news_mongo_data
+  ai_news_n8n_data:
+    driver: local
+    name: ai_news_n8n_data
+
+services:
+  ai_news_mongodb:
+    image: mongo:7.0
+    container_name: ai_news_mongodb_dev
+    hostname: ai_news_mongodb
+    environment:
+      TZ: ${DEFAULT_TIMEZONE}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGODB_DB_NAME}
+    ports:
+      - "${MONGODB_PORT}:27017"
+    volumes:
+      - ai_news_mongo_data:/data/db
+    restart: always
+    networks:
+      - ai_news_dev_network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mongosh",
+          "--username",
+          "${MONGODB_USER}",
+          "--password",
+          "${MONGODB_PASSWORD}",
+          "--authenticationDatabase",
+          "admin",
+          "--eval",
+          "db.adminCommand('ping').ok",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  ai_news_mongo_express:
+    image: mongo-express
+    container_name: ai_news_mongo_express_dev
+    restart: always
+    environment:
+      TZ: ${DEFAULT_TIMEZONE}
+      ME_CONFIG_MONGODB_SERVER: ai_news_mongodb
+      ME_CONFIG_MONGODB_PORT: ${MONGODB_PORT}
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGODB_USER}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGODB_PASSWORD}
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGODB_USER}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGODB_PASSWORD}
+    ports:
+      - "${MONGO_EXPRESS_PORT}:8081"
+    depends_on:
+      ai_news_mongodb:
+        condition: service_healthy
+    networks:
+      - ai_news_dev_network
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:1.115.3
+    container_name: ai_news_n8n_dev
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - TZ=${DEFAULT_TIMEZONE}
+
+      # Use MongoDB as database
+      - DB_TYPE=mongodb
+      - DB_MONGODB_CONNECTION_URL=${N8N_DB_URI}
+      - DB_MONGODB_DATABASE=${N8N_DB_NAME}
+      - DB_MONGODB_COLLECTION_NAME=workflow_data
+      - DB_MONGODB_CREDENTIALS_USERNAME=${MONGODB_USER}
+      - DB_MONGODB_CREDENTIALS_PASSWORD=${MONGODB_PASSWORD}
+
+      # n8n settings
+      - N8N_BASIC_AUTH_ACTIVE=${N8N_BASIC_AUTH_ACTIVE}
+      - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD}
+      - N8N_HOST=${N8N_HOST}
+      - N8N_PORT=${N8N_PORT}
+      - N8N_PROTOCOL=${N8N_PROTOCOL}
+      - N8N_PATH=${N8N_PATH}
+      - N8N_EDITOR_BASE_URL=${N8N_EDITOR_BASE_URL}
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=${N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS}
+      - N8N_RUNNERS_ENABLED=${N8N_RUNNERS_ENABLED}
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=${N8N_BLOCK_ENV_ACCESS_IN_NODE}
+      - N8N_GIT_NODE_DISABLE_BARE_REPOS=${N8N_GIT_NODE_DISABLE_BARE_REPOS}
+
+    ports:
+      - "${N8N_PORT}:${N8N_PORT}"
+    volumes:
+      - ai_news_n8n_data:/home/node/.n8n
+    depends_on:
+      ai_news_mongodb:
+        condition: service_healthy
+    networks:
+      - ai_news_dev_network
