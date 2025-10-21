@@ -1,0 +1,124 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/news": {
+      "post": {
+        "operationId": "NewsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNewsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Create a news article entry",
+        "tags": [
+          "News"
+        ]
+      },
+      "get": {
+        "operationId": "NewsController_findAll",
+        "parameters": [
+          {
+            "name": "topic",
+            "required": false,
+            "in": "query",
+            "description": "Topic to filter news articles (optional).",
+            "schema": {
+              "example": "technology",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number for pagination (optional, default is 1).",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page for pagination (optional, default is 10).",
+            "schema": {
+              "example": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Field to sort the news articles by (optional, default is createdAt).",
+            "schema": {
+              "example": "createdAt",
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "required": false,
+            "in": "query",
+            "description": "Order of sorting: \"asc\" for ascending or \"desc\" for descending (optional, default is desc).",
+            "schema": {
+              "example": "desc",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get all news articles",
+        "tags": [
+          "News"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "AI-Driven-News-Intelligence-Server-Development",
+    "description": "Swagger API documentation for AI-Driven-News-Intelligence-Server-Development",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "CreateNewsDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "example": "https://example.com/news/article-123",
+            "description": "The URL of the news or blog article to be added."
+          },
+          "timezone": {
+            "type": "string",
+            "example": "Asia/Karachi",
+            "description": "The timezone associated with the news article, the default is UTC (optional)."
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    }
+  }
+}

@@ -8,9 +8,6 @@ volumes:
   ai_news_mongo_data:
     driver: local
     name: ai_news_mongo_data
-  ai_news_n8n_data:
-    driver: local
-    name: ai_news_n8n_data
 
 services:
   ai_news_mongodb:
@@ -61,47 +58,6 @@ services:
       ME_CONFIG_BASICAUTH_PASSWORD: ${MONGODB_PASSWORD}
     ports:
       - "${MONGO_EXPRESS_PORT}:8081"
-    depends_on:
-      ai_news_mongodb:
-        condition: service_healthy
-    networks:
-      - ai_news_dev_network
-
-  n8n:
-    image: docker.n8n.io/n8nio/n8n:1.115.3
-    container_name: ai_news_n8n_dev
-    restart: unless-stopped
-    environment:
-      - NODE_ENV=${NODE_ENV}
-      - TZ=${DEFAULT_TIMEZONE}
-
-      # Use MongoDB as database
-      - DB_TYPE=mongodb
-      - DB_MONGODB_CONNECTION_URL=${N8N_DB_URI}
-      - DB_MONGODB_DATABASE=${N8N_DB_NAME}
-      - DB_MONGODB_COLLECTION_NAME=workflow_data
-      - DB_MONGODB_CREDENTIALS_USERNAME=${MONGODB_USER}
-      - DB_MONGODB_CREDENTIALS_PASSWORD=${MONGODB_PASSWORD}
-
-      # n8n settings
-      - N8N_BASIC_AUTH_ACTIVE=${N8N_BASIC_AUTH_ACTIVE}
-      - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER}
-      - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD}
-      - N8N_HOST=${N8N_HOST}
-      - N8N_PORT=${N8N_PORT}
-      - N8N_PROTOCOL=${N8N_PROTOCOL}
-      - N8N_PATH=${N8N_PATH}
-      - N8N_EDITOR_BASE_URL=${N8N_EDITOR_BASE_URL}
-      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
-      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=${N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS}
-      - N8N_RUNNERS_ENABLED=${N8N_RUNNERS_ENABLED}
-      - N8N_BLOCK_ENV_ACCESS_IN_NODE=${N8N_BLOCK_ENV_ACCESS_IN_NODE}
-      - N8N_GIT_NODE_DISABLE_BARE_REPOS=${N8N_GIT_NODE_DISABLE_BARE_REPOS}
-
-    ports:
-      - "${N8N_PORT}:${N8N_PORT}"
-    volumes:
-      - ai_news_n8n_data:/home/node/.n8n
     depends_on:
       ai_news_mongodb:
         condition: service_healthy

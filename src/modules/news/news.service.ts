@@ -48,7 +48,7 @@ export class NewsService {
 
       return await news.save();
     } catch (error) {
-      // this.logger.error('❌ Error calling n8n webhook', error);
+      this.logger.error('❌ Error calling n8n webhook', error);
       throw new BadRequestException('Error while calling news summary webhook');
     }
   }

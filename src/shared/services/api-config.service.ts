@@ -6,8 +6,20 @@ import { envT } from 'src/types/env.types';
 export class ApiConfigService {
   constructor(private configService: ConfigService) {}
 
+  getCorsOrigins(): string[] | '*' {
+    const origins = this.get('CORS_ORIGINS');
+    if (!origins || origins === '*') return '*';
+
+    // Split by comma, trim spaces
+    return origins.split(',').map((origin) => origin.trim());
+  }
+
   get isDevelopment(): boolean {
     return this.nodeEnv === 'development';
+  }
+
+  get isProduction(): boolean {
+    return this.nodeEnv === 'production';
   }
 
   get nodeEnv(): string {

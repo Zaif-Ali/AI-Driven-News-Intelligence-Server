@@ -2,6 +2,9 @@ export type envT = {
   NODE_ENV: string;
   PORT: number;
   APPLICATION_NAME: string;
+  API_PREFIX: string;
+  SWAGGER_API_PATH: string;
+  CORS_ORIGINS: string;
   // Throttler Rate limiter config
   RATE_LIMITER_LIMIT: number;
   RATE_LIMITER_TTL: number;

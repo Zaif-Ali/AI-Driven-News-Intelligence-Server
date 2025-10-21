@@ -4,6 +4,9 @@ export const envConfiguration = (): envT => ({
   NODE_ENV: process.env.NODE_ENV as string,
   PORT: Number(process.env.PORT as string),
   APPLICATION_NAME: process.env.APPLICATION_NAME as string,
+  API_PREFIX: process.env.API_PREFIX as string,
+  SWAGGER_API_PATH: process.env.SWAGGER_API_PATH as string,
+  CORS_ORIGINS: process.env.CORS_ORIGINS as string,
   // Throttler Rate limiter config
   RATE_LIMITER_LIMIT: Number(process.env.RATE_LIMITER_LIMIT as string),
   RATE_LIMITER_TTL: Number(process.env.RATE_LIMITER_TTL as string),
